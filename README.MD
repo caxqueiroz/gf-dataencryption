@@ -2,6 +2,8 @@
 
 **Simple example on how to use encryption on GF. Don't use in PROD.**
 
+** KEY MANAGEMENT is out of scope here **
+
 Sample uses three different ways of encrypting data (see [tests](src/test/java/io/pivotal/gemfire/encryption/DataEncryptionTest.java)):
 
 - client side: data/attribute/field are encrypted using bouncycastle lib on the client app. 
