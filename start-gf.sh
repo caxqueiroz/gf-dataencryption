@@ -19,7 +19,8 @@ function startServers {
         fi
         echo -e "\033[1m=> Starting GemFire server number ${i} \033[0m"
         SERVERPORT=$[SERVERPORT + 1]
-        gfsh start server --name=server${i} --dir=$BASEDIR/server${i} --locators=$HOSTNAME[$CLIENTPORT] --server-port=$SERVERPORT --initial-heap=4G --max-heap=4G --J=-Dencryption.passphrase=123456 --cache-xml-file=$BASEDIR/cache.xml --classpath=$BASEDIR/dataencryption-0.0.1-SNAPSHOT-shared
+        gfsh start server --name=server${i} --dir=$BASEDIR/server${i} --locators=$HOSTNAME[$CLIENTPORT] --server-port=$SERVERPORT --initial-heap=4G --max-heap=4G --J=-Dencryption.passphrase=$1
+        --cache-xml-file=$BASEDIR/cache.xml --classpath=$BASEDIR/dataencryption-0.0.1-SNAPSHOT-shared
         .jar:$BASEDIR/bcprov-jdk15on-154.jar
     done
 }

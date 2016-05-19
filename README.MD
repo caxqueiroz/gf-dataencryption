@@ -29,8 +29,16 @@ $  java -jar target/dataencryption-0.0.1-SNAPSHOT.jar --gemfire.locator.address=
 ## To run (server)
 
 ```
-$ ./start-gf.sh
+$ ./start-gf.sh <passphrase>
 ```
+
+## Dependencies
+
+Download BouncyCastle [here](https://www.bouncycastle.org/download/bcprov-jdk15on-154.jar)
+
+Make sure to copy the jar file to your $BASEDIR (per start-gf.sh script). 
+
+Also copy the target/dataencryption-0.0.1-SNAPSHOT-shared.jar to $BASEDIR
 
 
 ## Cache.xml (encryption as compressor)
@@ -62,7 +70,7 @@ $ ./start-gf.sh
    <region name="dummyRegion">
       <region-attributes data-policy="partition">
             <cache-writer>
-              <class-name>io.pivotal.gemfire.encryption.shared.EncryptionC</class-name>
+              <class-name>io.pivotal.gemfire.encryption.shared.EncryptionWriter</class-name>
            </cache-writer>
       </region-attributes>
   </region>
