@@ -1,6 +1,7 @@
 package io.pivotal.gemfire.encryption;
 
 import com.gemstone.gemfire.cache.Region;
+import io.pivotal.gemfire.encryption.shared.Dummy;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;

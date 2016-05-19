@@ -1,11 +1,16 @@
 package io.pivotal.gemfire.encryption;
 
-import com.gemstone.gemfire.cache.Cache;
-import com.gemstone.gemfire.cache.CacheFactory;
-import com.gemstone.gemfire.cache.Region;
+import com.gemstone.gemfire.cache.*;
 import com.gemstone.gemfire.distributed.ServerLauncher;
+import io.pivotal.gemfire.encryption.shared.CryptoUtils;
+import io.pivotal.gemfire.encryption.shared.Dummy;
+import io.pivotal.gemfire.encryption.shared.EncryptionC;
+import io.pivotal.gemfire.encryption.shared.EncryptionWriter;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Properties;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
@@ -25,7 +30,6 @@ public class DataEncryptionTest {
 
         ServerLauncher serverLauncher  = new ServerLauncher.Builder()
                 .setMemberName("server1")
-                .set("cache-xml-file", "server-cache.xml")
                 .set("log-level", "info")
                 .build();
 
@@ -37,12 +41,18 @@ public class DataEncryptionTest {
 
         cache = new CacheFactory().create();
 
+
+
     }
 
     @Test
     public void testDataWrite(){
+        String regionName = "dummyRegion01";
+        RegionFactory<Long,Dummy> regionFactory = cache.createRegionFactory();
+        regionFactory.setDataPolicy(DataPolicy.PARTITION).create(regionName);
 
-        Region region = cache.getRegion("dummyRegion");
+        Region region = cache.getRegion(regionName);
+
 
         Dummy dummy0 = new Dummy();
         dummy0.setId(1L);
@@ -70,6 +80,12 @@ public class DataEncryptionTest {
     @Test
     public void testDataService() throws Exception {
 
+        String regionName = "dummyRegion02";
+        RegionFactory<Long,Dummy> regionFactory = cache.createRegionFactory();
+        regionFactory.setDataPolicy(DataPolicy.PARTITION).create(regionName);
+
+        Region region = cache.getRegion(regionName);
+
         Dummy dummy0 = new Dummy();
         dummy0.setId(1L);
         dummy0.setData1("Hello World!");
@@ -87,11 +103,9 @@ public class DataEncryptionTest {
 
         DummyRepository repository = new DummyRepository();
 
-        Region region = cache.getRegion("dummyRegion");
-
         repository.setRegion(region);
 
-        DataEncryptionService service = new DataEncryptionService("123456");
+        DataEncryptionService service = new DataEncryptionService();
         service.setRepository(repository);
 
 
@@ -106,21 +120,29 @@ public class DataEncryptionTest {
     @Test
     public void testEncryption() throws Exception {
 
+        String regionName = "dummyRegion03";
+        RegionFactory<Long,Dummy> regionFactory = cache.createRegionFactory();
+        regionFactory.setDataPolicy(DataPolicy.PARTITION).create(regionName);
+
+        Region region = cache.getRegion(regionName);
+
         Dummy dummy0 = new Dummy();
         dummy0.setId(1L);
         dummy0.setData1("Hello World!");
         dummy0.setData2("555-555-555-555");
 
 
-
         DummyRepository repository = new DummyRepository();
-
-        Region region = cache.getRegion("dummyRegion");
 
         repository.setRegion(region);
 
-        DataEncryptionService service = new DataEncryptionService("123456");
+        DataEncryptionService service = new DataEncryptionService();
 
+        CryptoUtils cryptoUtils = new CryptoUtils();
+        ReflectionTestUtils.setField(cryptoUtils,"passphrase","password");
+        cryptoUtils.init();
+
+        service.setCryptoUtils(cryptoUtils);
         service.setRepository(repository);
 
 
@@ -129,6 +151,81 @@ public class DataEncryptionTest {
         assertThat(service.getData(1L).getData2(),not("555-555-555-555"));
 
         assertThat(service.getDataAndDecrypt(1L).getData2(),equalTo("555-555-555-555"));
+
+    }
+
+    @Test
+    public void testCacheWriter() throws Exception {
+        CryptoUtils cryptoUtils = new CryptoUtils();
+        ReflectionTestUtils.setField(cryptoUtils,"passphrase","password");
+        cryptoUtils.init();
+
+        EncryptionWriter writer = new EncryptionWriter();
+        writer.setUtils(cryptoUtils);
+
+        Properties properties = new Properties();
+        properties.setProperty("encryptionEnabled","True");
+        writer.init(properties);
+
+        String regionName = "dummyRegion00";
+        RegionFactory<Long,Dummy> regionFactory = cache.createRegionFactory();
+        regionFactory.setCacheWriter(writer).setDataPolicy(DataPolicy.PARTITION).create(regionName);
+
+        Dummy dummy0 = new Dummy();
+        dummy0.setId(1L);
+        dummy0.setData1("Hello World!");
+        dummy0.setData2("555-555-555-555");
+
+        DummyRepository repository = new DummyRepository();
+
+        Region region = cache.getRegion(regionName);
+
+        repository.setRegion(region);
+
+        DataEncryptionService service = new DataEncryptionService();
+
+
+        service.setCryptoUtils(cryptoUtils);
+        service.setRepository(repository);
+
+        service.saveData(dummy0);
+
+        assertThat(service.getData(1L).getData2(),not("555-555-555-555"));
+
+    }
+
+    @Test
+    public void testEncryptionC() throws Exception {
+
+        System.setProperty("encryption.passphrase","password");
+
+        EncryptionC encryptionC = new EncryptionC();
+
+
+        String regionName = "dummyRegion100";
+        RegionFactory<Long,Dummy> regionFactory = cache.createRegionFactory();
+        regionFactory.setCompressor(encryptionC).setDataPolicy(DataPolicy.PARTITION).create(regionName);
+
+
+        Dummy dummy0 = new Dummy();
+        dummy0.setId(1L);
+        dummy0.setData1("Hello World!");
+        dummy0.setData2("555-555-555-555");
+
+        DummyRepository repository = new DummyRepository();
+
+        Region region = cache.getRegion(regionName);
+
+        repository.setRegion(region);
+
+        DataEncryptionService service = new DataEncryptionService();
+
+        service.setRepository(repository);
+
+        service.saveData(dummy0);
+
+        assertThat(service.getData(1L).getData2(),equalTo("555-555-555-555"));
+
 
     }
 }

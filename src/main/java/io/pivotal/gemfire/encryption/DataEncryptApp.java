@@ -1,6 +1,6 @@
 package io.pivotal.gemfire.encryption;
 
-import com.gemstone.gemfire.cache.Region;
+import io.pivotal.gemfire.encryption.shared.Dummy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +23,6 @@ public class DataEncryptApp implements CommandLineRunner{
     @Override
     public void run(String... strings) throws Exception {
 
-        Dummy dummy0 = new Dummy();
-        dummy0.setId(1L);
-        dummy0.setData1("Hello World!");
-        dummy0.setData2("555-555-555-555");
-
-        service.saveData(dummy0);
 
         Dummy dummy1 = new Dummy();
         dummy1.setId(2L);
@@ -37,22 +31,9 @@ public class DataEncryptApp implements CommandLineRunner{
 
         service.saveData(dummy1);
 
-        Dummy returnedObject = service.getData(1L);
+        Dummy returnedObject = service.getData(2L);
 
-        logger.info("returned object (NOT encrypted): {}", returnedObject);
-
-
-        service.saveDataAndEncrypt(dummy1);
-
-        Dummy returnedObjectWithEncryption = service.getData(2L);
-
-        logger.info("returned object (with encryption): {}", returnedObjectWithEncryption);
-
-        returnedObjectWithEncryption = service.getDataAndDecrypt(2L);
-
-        logger.info("returned object (with encryption and decryption): {}", returnedObjectWithEncryption);
-
-
+        logger.info("returned object: {}", returnedObject);
 
     }
 

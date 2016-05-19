@@ -1,4 +1,4 @@
-package io.pivotal.gemfire.encryption;
+package io.pivotal.gemfire.encryption.shared;
 
 import com.gemstone.gemfire.DataSerializable;
 
