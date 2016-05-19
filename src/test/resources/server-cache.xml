@@ -1,0 +1,14 @@
+<!DOCTYPE cache PUBLIC
+        "-//GemStone Systems, Inc.//GemFire Declarative Caching 8.0//EN"
+        "http://www.gemstone.com/dtd/cache8_0.dtd">
+<cache>
+    <cache-server bind-address="localhost" port="0" hostname-for-clients="localhost"/>
+
+    <region name="dummyRegion">
+        <region-attributes data-policy="partition">
+            <key-constraint>java.lang.Long</key-constraint>
+            <value-constraint>io.pivotal.gemfire.encryption.Dummy</value-constraint>
+        </region-attributes>
+    </region>
+
+</cache>
