@@ -1,5 +1,7 @@
 # Sample application that encrypt data and save on Gemfire. 
 
+Very BASIC application. **Not using best practices for security**. 
+
 ## To compile
 
 ```
