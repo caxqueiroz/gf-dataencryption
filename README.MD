@@ -1,4 +1,4 @@
-# Sample application that encrypt data and save on Gemfire. 
+# Sample app that encrypts data on GF. 
 
 **Simple example on how to use encryption on GF. Don't use in PROD.**
 
