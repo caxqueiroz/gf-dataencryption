@@ -25,7 +25,7 @@ $ mvn clean package
 ## To run (client)
 
 ```
-$  java -jar target/dataencryption-0.0.1-SNAPSHOT.jar --gemfire.locator.address=<locator addr> --gemfire.locator.port=<locator port> --passphrase=<passphrase used to encrypt/decrypt>
+$  java -jar target/dataencryption-0.0.1-SNAPSHOT.jar --gemfire.locator.address=<locator addr> --gemfire.locator.port=<locator port> --passphrase=<passphrase used to encrypt/decrypt> --gemfire.region.name=<region name>
 ```
 
 ## To run (server)
