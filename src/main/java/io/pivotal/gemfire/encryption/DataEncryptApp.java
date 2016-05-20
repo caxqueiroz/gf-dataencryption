@@ -23,6 +23,9 @@ public class DataEncryptApp implements CommandLineRunner{
     @Override
     public void run(String... strings) throws Exception {
 
+        logger.info("Using Compressor/encryption");
+        logger.info("============================");
+        logger.info("Data stays encrypted in-memory. But client `sees` it normally");
 
         Dummy dummy1 = new Dummy();
         dummy1.setId(2L);
@@ -34,6 +37,21 @@ public class DataEncryptApp implements CommandLineRunner{
         Dummy returnedObject = service.getData(2L);
 
         logger.info("returned object: {}", returnedObject);
+
+        logger.info("client side encryption");
+        logger.info("============================");
+        logger.info("Data encrypted on client side.");
+        Dummy dummy2 = new Dummy();
+        dummy2.setId(5L);
+        dummy2.setData1("My data 5");
+        dummy2.setData2("555-555-555-555");
+
+        service.saveDataAndEncrypt(dummy2);
+
+        logger.info("returned object (NO decryption applied): {}", service.getData(5L));
+
+        logger.info("returned object (decrypted): {}", service.getDataAndDecrypt(5L));
+
 
     }
 
